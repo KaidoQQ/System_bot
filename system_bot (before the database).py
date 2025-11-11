@@ -832,4 +832,35 @@ def back_menu(call):
   )
   bot.answer_callback_query(call.id)
 
+@bot.callback_query_handler(func=lambda call: call.data == "build_complete")
+def build_complete(call):
+  user_id = call.from_user.id
+  computer = get_current_computer(user_id)
+    
+  markup = types.InlineKeyboardMarkup()
+  btn1 = types.InlineKeyboardButton("👀 View Components", callback_data="view_components")
+  btn2 = types.InlineKeyboardButton("🔄 Upgrade system", callback_data="ch_component")
+  btn3 = types.InlineKeyboardButton("🖥️ Create New", callback_data="new_comp")
+  btn4 = types.InlineKeyboardButton("⬅️ Main Menu", callback_data="back_menu")
+    
+  markup.row(btn1, btn2)
+  markup.row(btn3)
+  markup.row(btn4)
+
+  bot.edit_message_text(
+    chat_id=call.message.chat.id,
+    message_id=call.message.message_id,
+    text= f"🎉 **Build Complete!** 🎉\n\n"
+          f"🖥️ **{computer['name']}** is ready!\n\n"
+          f"All components have been added:\n"
+          f"🔧 {computer['cpu']}\n"
+          f"💾 {computer['ram']}\n"
+          f"🖳 {computer['gpu']}\n"
+          f"📦 {computer['storage']}\n"
+          f"📁 {computer['motherboard']}\n\n"
+          f"Your dream computer is assembled!",
+    reply_markup=markup,
+    parse_mode="Markdown"
+  )
+
 bot.infinity_polling()
