@@ -1,0 +1,11 @@
+# Секретные ключи (Самое важное!)
+tokens.env
+.env
+
+# Временные файлы Python
+__pycache__/
+*.pyc
+tempCodeRunnerFile.py
+
+# Системные файлы
+desktop.ini
