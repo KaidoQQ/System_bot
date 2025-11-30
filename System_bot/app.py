@@ -4,12 +4,6 @@ import sqlite3
 
 app = Flask(__name__)
 
-@app.route("/")
-def stats():
-  fake_count = 42
-
-  return render_template('stats.html',count = fake_count)
-
 @app.route("/user/<int:id>")
 def info_user(id):
   conn = sqlite3.connect('computers.db', check_same_thread=False)
