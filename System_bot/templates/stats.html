@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Build Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 900px; margin: 0 auto; background-color: #f8f9fa; }
+        h1 { text-align: center; color: #333; }
+        
+        .container { display: flex; gap: 30px; margin-top: 30px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .buttons-panel { width: 30%; border-right: 1px solid #eee; padding-right: 20px; }
+        .display-panel { width: 70%; }
+        
+        /* Buttons styling */
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        button:hover { background: #f1f1f1; transform: translateX(5px); }
+        button.active { background: #007bff; color: white; border-color: #0056b3; }
+
+        /* Table styling */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; color: #666; }
+        .total-row { font-weight: bold; background-color: #e9ecef; }
+
+        /* Chart container */
+        .chart-container { width: 300px; height: 300px; margin: 0 auto; }
+        
+        .placeholder-text { text-align: center; color: #888; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <h1>🖥️ Your PC Builds Dashboard</h1>
+
+    <div class="container">
+        <div class="buttons-panel">
+            <h3>Select a Build:</h3>
+            <div id="buttons-container">
+                {% if id_user|length == 0 %}
+                    <p style="color: red;">No builds found.</p>
+                {% endif %}
+
+                {% for computer in id_user %}
+                    <button onclick="showBuild({{ loop.index0 }}, this)">
+                        Build #{{ computer.id }}: {{ computer.name }}
+                    </button>
+                {% endfor %}
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #888;">
+                Total builds: {{ count }}
+            </div>
+        </div>
+
+        <div class="display-panel">
+            <h2 id="build-title" style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">
+                Select a build from the left...
+            </h2>
+            
+            <div id="content-area" style="display: none;">
+                <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+
+                <table id="details-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Model Name</th>
+                            <th>Price ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>CPU</td><td id="cpu-name">-</td><td id="cpu-price">0</td></tr>
+                        <tr><td>GPU</td><td id="gpu-name">-</td><td id="gpu-price">0</td></tr>
+                        <tr><td>RAM</td><td id="ram-name">-</td><td id="ram-price">0</td></tr>
+                        <tr><td>Storage</td><td id="stor-name">-</td><td id="stor-price">0</td></tr>
+                        <tr><td>Motherboard</td><td id="mobo-name">-</td><td id="mobo-price">0</td></tr>
+                        <tr class="total-row"><td>TOTAL</td><td></td><td id="total-price">0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="placeholder" class="placeholder-text">
+                👈 Click on a button to view statistics
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Get data from Python and convert it to a JavaScript object
+        // The 'tojson' filter is crucial here
+        const computersData = {{ id_user | tojson }};
+        
+        let myChart = null;
+
+        function showBuild(index, btnElement) {
+            // 2. Get the specific computer data
+            const comp = computersData[index];
+            
+            // 3. UI Updates (Hide placeholder, show content)
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('content-area').style.display = 'block';
+            
+            // Highlight active button
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // 4. Update Texts
+            document.getElementById('build-title').innerText = comp.name;
+
+            // Helper function to safely get values (handles None/null)
+            const safeText = (val) => val ? val : 'Not set';
+            const safePrice = (val) => val ? val : 0;
+
+            // Update Table
+            document.getElementById('cpu-name').innerText = safeText(comp.cpu);
+            document.getElementById('cpu-price').innerText = safePrice(comp.cpu_price);
+            
+            document.getElementById('gpu-name').innerText = safeText(comp.gpu);
+            document.getElementById('gpu-price').innerText = safePrice(comp.gpu_price);
+            
+            document.getElementById('ram-name').innerText = safeText(comp.ram);
+            document.getElementById('ram-price').innerText = safePrice(comp.ram_price);
+            
+            document.getElementById('stor-name').innerText = safeText(comp.storage);
+            document.getElementById('stor-price').innerText = safePrice(comp.storage_price); // Fixed key name
+            
+            document.getElementById('mobo-name').innerText = safeText(comp.motherboard);
+            document.getElementById('mobo-price').innerText = safePrice(comp.motherboard_price);
+            
+            document.getElementById('total-price').innerText = '$' + safePrice(comp.total_price);
+
+            // 5. Update Chart
+            updateChart(comp);
+        }
+
+        function updateChart(comp) {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // Prepare data (convert nulls to 0)
+            const prices = [
+                comp.cpu_price || 0,
+                comp.gpu_price || 0,
+                comp.ram_price || 0,
+                comp.storage_price || 0,
+                comp.motherboard_price || 0
+            ];
+
+            // If a chart already exists, destroy it before creating a new one
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut', // Circle chart
+                data: {
+                    labels: ['CPU', 'GPU', 'RAM', 'Storage', 'Motherboard'],
+                    datasets: [{
+                        data: prices,
+                        backgroundColor: [
+                            '#FF6384', // Red
+                            '#36A2EB', // Blue
+                            '#FFCE56', // Yellow
+                            '#4BC0C0', // Green
+                            '#9966FF'  // Purple
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

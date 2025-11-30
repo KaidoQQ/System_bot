@@ -105,7 +105,7 @@ def import_prices_from_csv(csv_file_path = 'components.csv'):
 
 
 init_database()
-#import_prices_from_csv()
+import_prices_from_csv()
 #===================== Function for retrieving user data =====================
 def get_user_data(user_id):
   if user_id not in user_data_cache:
@@ -402,24 +402,33 @@ def start(message):
 
   show_main_menu(message.chat.id,user_id) 
 
+@bot.message_handler(commands=['myid'])
+def show_id(message):
+  bot.reply_to(message, f"Твой ID: {message.from_user.id}")
 
-def show_main_menu(chat_id,user_id):
+
+def show_main_menu(chat_id, user_id):
   markup = types.InlineKeyboardMarkup()
 
-  btn1 = types.InlineKeyboardButton("🖥️ Create new system",callback_data="tab1")
-  btn2 = types.InlineKeyboardButton("👾 View all systems",callback_data="tab2")
-  btn3 = types.InlineKeyboardButton("🔄 Upgrade system",callback_data="tab3")
-  btn4 = types.InlineKeyboardButton("📚 View tutorials",callback_data="tab4")
+  btn1 = types.InlineKeyboardButton("🖥️ Create new system", callback_data="tab1")
+  btn2 = types.InlineKeyboardButton("👾 View all systems", callback_data="tab2")
+  btn3 = types.InlineKeyboardButton("🔄 Upgrade system", callback_data="tab3")
+  btn4 = types.InlineKeyboardButton("📚 View tutorials", callback_data="tab4")
+  
+  link = f"http://127.0.0.1:5000/user/{user_id}"
+
+  btn5 = types.InlineKeyboardButton("📊 Web Dashboard", url=link)
 
   markup.row(btn1)
-  markup.row(btn2,btn3)
-  markup.row(btn4)
+  markup.row(btn2, btn3)
+  markup.row(btn4, btn5)
 
   bot.send_message(
     chat_id,
     "✨ Welcome to the Telegram bot where you can create and test your system ✨",
     reply_markup=markup
   )
+
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("tab"))
 def handle_tabs(call):
@@ -471,7 +480,7 @@ def handle_tabs(call):
         markup.add(types.InlineKeyboardButton(text, url=data))
       else:
         markup.add(types.InlineKeyboardButton(text, callback_data=data))
-    
+
   else:
     markup.add(types.InlineKeyboardButton("⬅️ Назад в меню", callback_data="back_menu"))  
     
@@ -1762,15 +1771,19 @@ def show_buttons_with_components(call):
 @bot.callback_query_handler(func=lambda call:call.data == "back_menu")
 def back_menu(call):
   markup = types.InlineKeyboardMarkup()
+  user_id = call.from_user.id
 
   btn1 = types.InlineKeyboardButton("🖥️ Create new system",callback_data="tab1")
   btn2 = types.InlineKeyboardButton("👾 View all systems",callback_data="tab2")
   btn3 = types.InlineKeyboardButton("🔄 Upgrade system",callback_data="tab3")
   btn4 = types.InlineKeyboardButton("📚 View tutorials",callback_data="tab4")
 
+  link = f"http://127.0.0.1:5000/user/{user_id}"
+  btn5 = types.InlineKeyboardButton("📊 Web Dashboard", url=link)
+
   markup.row(btn1)
   markup.row(btn2,btn3)
-  markup.row(btn4)
+  markup.row(btn4,btn5)
 
   bot.edit_message_text(
     chat_id=call.message.chat.id, 
