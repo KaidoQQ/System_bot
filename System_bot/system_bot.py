@@ -44,7 +44,8 @@ def init_database():
       component_type TEXT,
       component_name TEXT,
       average_price_dollar INTEGER,
-      category TEXT         
+      category TEXT,
+      component_url TEXT         
       )
   ''')
 
@@ -71,12 +72,16 @@ def import_prices_from_csv(csv_file_path = 'components.csv'):
               component_name = row[1].strip()
               average_price_dollar = int(row[2].strip())
               category = row[3].strip()
+              if len(row) >= 5:
+                component_url = row[4].strip()
+              else:
+                component_url = None
 
               cursor.execute('''
                 INSERT OR REPLACE INTO components_price 
-                (component_type, component_name, average_price_dollar, category)
-                VALUES (?, ?, ?, ?)
-              ''', (component_type, component_name, average_price_dollar, category))
+                (component_type, component_name, average_price_dollar, category, component_url)
+                VALUES (?, ?, ?, ?, ?)
+              ''', (component_type, component_name, average_price_dollar, category, component_url))
 
               imported_count += 1
               print(f"✅ Added: {component_name} - ${average_price_dollar}")
@@ -102,6 +107,19 @@ def import_prices_from_csv(csv_file_path = 'components.csv'):
     finally:
       if 'conn' in locals():
         conn.close() 
+
+
+def product_link(component_name):
+  conn = sqlite3.connect('computers.db',check_same_thread=False)
+  cursor = conn.cursor()
+
+  cursor.execute(' SELECT component_url FROM components_price WHERE component_name = ?',(component_name,))
+  result = cursor.fetchone()
+  conn.close()
+
+  if result and result[0]:
+    return result[0]
+  return None
 
 
 init_database()
@@ -1466,10 +1484,13 @@ def option_with_computers(call):
   btn2 = types.InlineKeyboardButton("👀 View all components",callback_data="view_components") 
   btn3 = types.InlineKeyboardButton("🗑️ Delete component", callback_data="del_component") 
   btn4 = types.InlineKeyboardButton("🤖 Check the build using AI", callback_data="ai_check")
-  btn5 = types.InlineKeyboardButton("⬅️ Back to menu",callback_data="back_menu") 
+  btn5 = types.InlineKeyboardButton("⬅️ Back to menu",callback_data="back_menu")
+  btn6 = types.InlineKeyboardButton("🛒 Buy products", callback_data="buy_component")
 
-  markup.row(btn1,btn2)
-  markup.row(btn3,btn4)
+
+
+  markup.row(btn4, btn6)
+  markup.row(btn2,btn3,btn1)
   markup.row(btn5)
 
   bot.edit_message_text(
@@ -1801,13 +1822,14 @@ def build_complete(call):
   markup = types.InlineKeyboardMarkup()
   btn1 = types.InlineKeyboardButton("👀 View Components", callback_data="view_components")
   btn2 = types.InlineKeyboardButton("🔄 Upgrade system", callback_data="ch_component")
-  btn3 = types.InlineKeyboardButton("🖥️ Create New", callback_data="new_comp")
-  btn4 = types.InlineKeyboardButton("🤖 Check the build using AI", callback_data="ai_check")
-  btn5 = types.InlineKeyboardButton("⬅️ Back to menu", callback_data="back_menu")
+  btn3 = types.InlineKeyboardButton("🛒 Buy products", callback_data="buy_component")
+  btn4 = types.InlineKeyboardButton("🖥️ Create New", callback_data="new_comp")
+  btn5 = types.InlineKeyboardButton("🤖 Check the build using AI", callback_data="ai_check")
+  btn6 = types.InlineKeyboardButton("⬅️ Back to menu", callback_data="back_menu")
     
   markup.row(btn1, btn2)
-  markup.row(btn3,btn4)
-  markup.row(btn5)
+  markup.row(btn3,btn4,btn5)
+  markup.row(btn6)
 
   bot.edit_message_text(
     chat_id=call.message.chat.id,
@@ -1824,6 +1846,43 @@ def build_complete(call):
           f"Your dream computer is assembled!",
     reply_markup=markup,
     parse_mode=None
+  )
+
+@bot.callback_query_handler(func=lambda call: call.data == "buy_component")
+def buy_component(call):
+  user_id = call.from_user.id
+  computer = get_current_computer(user_id)
+  markup = types.InlineKeyboardMarkup()
+
+  parts = [
+    ("CPU", computer['cpu']),
+    ("RAM", computer['ram']),
+    ("GPU", computer['gpu']),
+    ("Storage", computer['storage']),
+    ("Motherboard",computer['motherboard'])
+  ]
+
+  for type,name in parts:
+    if name:
+      link = product_link(name)
+      if link:
+        found_links = True
+        btn = types.InlineKeyboardButton(f"🛒 Buy {type}: {name}",url=link)
+        markup.add(btn)
+
+  markup.add(types.InlineKeyboardButton("⬅️ Back to Build", callback_data="build_complete"))
+
+  if found_links:
+    msg_text = "🛒 **Shopping List**\nHere are the links to buy your components:"
+  else:
+    msg_text = "😕 **No links found.**\nWe couldn't find shop links for these specific components in our database."
+
+  bot.edit_message_text(
+    chat_id=call.message.chat.id,
+    message_id=call.message.message_id,
+    text=msg_text,
+    reply_markup=markup,
+    parse_mode="Markdown"
   )
 
 @bot.callback_query_handler(func=lambda call: call.data == "ai_check")

@@ -1,28 +1,28 @@
-"component_type	";component_name;average_price_dollar;category
-cpu;Intel Core i5-13400;250;mid
-cpu;Intel Core i7-13700K;420;high
-cpu;Intel Core i9-13900K;580;flagship
-cpu;AMD Ryzen 5 7600X;300;mid
-cpu;AMD Ryzen 7 7700X;400;high
-cpu;AMD Ryzen 9 7900X;500;flagship
-cpu;Intel Core i3-12100;120;budget
-cpu;AMD Ryzen 5 5600X;180;budget
-ram;16GB DDR4 3200MHz;50;budget
-ram;16GB DDR5 4800MHz;80;mid
-ram;32GB DDR4 3200MHz;90;mid
-ram;32GB DDR5 5600MHz;120;high
-ram;64GB DDR5 6000MHz;220;flagship
-gpu;NVIDIA RTX 4060;300;mid
-gpu;NVIDIA RTX 4070;600;high
-gpu;NVIDIA RTX 4090;1600;flagship
-gpu;AMD RX 7600;270;budget
-gpu;AMD RX 7700 XT;450;mid
-gpu;AMD RX 7900 XTX;1000;high
-storage;500GB NVMe SSD;40;budget
-storage;1TB NVMe SSD;60;mid
-storage;2TB NVMe SSD;100;high
-storage;4TB NVMe SSD;200;flagship
-motherboard;ASUS PRIME B660;150;budget
-"motherboard	";Gigabyte B760;200;mid
-motherboard;ASUS ROG STRIX Z790;350;high
-motherboard;MSI MEG X670E;500;flagship
+"component_type	";component_name;average_price_dollar;category;component_url
+cpu;Intel Core i5-13400;250;mid;
+cpu;Intel Core i7-13700K;420;high;
+cpu;Intel Core i9-13900K;580;flagship;https://www.amazon.pl/Intel-komputer�w-stacjonarnych-elektrycznych-zintegrowan�/dp/B0BCF54SR1
+cpu;AMD Ryzen 5 7600X;300;mid;
+cpu;AMD Ryzen 7 7700X;400;high;
+cpu;AMD Ryzen 9 7900X;500;flagship;
+cpu;Intel Core i3-12100;120;budget;
+cpu;AMD Ryzen 5 5600X;180;budget;
+ram;16GB DDR4 3200MHz;50;budget;
+ram;16GB DDR5 4800MHz;80;mid;
+ram;32GB DDR4 3200MHz;90;mid;https://www.amazon.pl/Corsair-Vengeance-32GB-2x16GB-3200MHz/dp/B07RW6Z692
+ram;32GB DDR5 5600MHz;120;high;
+ram;64GB DDR5 6000MHz;220;flagship;
+gpu;NVIDIA RTX 4060;300;mid;https://www.amazon.pl/Gigabyte-EAGLE-GeForce-NVIDIA-GDDR6/dp/B0C5JVS8VG
+gpu;NVIDIA RTX 4070;600;high;
+gpu;NVIDIA RTX 4090;1600;flagship;
+gpu;AMD RX 7600;270;budget;
+gpu;AMD RX 7700 XT;450;mid;
+gpu;AMD RX 7900 XTX;1000;high;
+storage;500GB NVMe SSD;40;budget;
+storage;1TB NVMe SSD;60;mid;https://www.amazon.pl/Lexar-Wewn�trzny-wysokowydajny-wewn�trzny-renderowania/dp/B0DNMCJHJP
+storage;2TB NVMe SSD;100;high;
+storage;4TB NVMe SSD;200;flagship;
+motherboard;ASUS PRIME B660;150;budget;
+"motherboard	";Gigabyte B760;200;mid;
+motherboard;ASUS ROG STRIX Z790;350;high;https://www.amazon.pl/Strix-Z790-Gaming-90MB1CN0-M0EAY0-Matryca/dp/B0BH97W2N4
+motherboard;MSI MEG X670E;500;flagship;

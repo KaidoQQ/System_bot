@@ -2,6 +2,10 @@
 tokens.env
 .env
 
+# Игнорировать базу данных
+computers.db
+*.db
+
 # Временные файлы Python
 __pycache__/
 *.pyc
