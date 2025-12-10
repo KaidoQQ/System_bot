@@ -420,10 +420,6 @@ def start(message):
 
   show_main_menu(message.chat.id,user_id) 
 
-@bot.message_handler(commands=['myid'])
-def show_id(message):
-  bot.reply_to(message, f"Твой ID: {message.from_user.id}")
-
 
 def show_main_menu(chat_id, user_id):
   markup = types.InlineKeyboardMarkup()

@@ -68,7 +68,7 @@ python System_bot/system_bot.py
 - [x] SQLite Database Integration
 - [x] AI Compatibility Check (Gemini)
 - [x] **Web Dashboard:** A Flask-based web interface for viewing user statistics.
-- [ ] PDF Export for build lists.
+- [x] Automatization.
 
 ## 🤝 Contributing
 
