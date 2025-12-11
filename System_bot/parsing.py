@@ -8,8 +8,11 @@ import re
 
 def get_amazon(url):
   headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9,pl;q=0.8", 
+      "Referer": "https://www.google.com/", 
+      "Upgrade-Insecure-Requests": "1",
   }
 
   try:
@@ -24,7 +27,8 @@ def get_amazon(url):
         clean_price = re.sub(r'\D', '', raw_price)
         return int(clean_price)
       else:
-        print("Cant get a price")
+        title = soup.title.text.strip() if soup.title else "No Title"
+        print(f"   ⚠️ Cant get a price. Page title: '{title}'")
     else:
       print("Cant enter to site")
       return None
@@ -37,7 +41,7 @@ def update_base():
   conn = sqlite3.connect('computers.db',check_same_thread=False)
   cursor = conn.cursor()
 
-  cursor.execute('SELECT component_name, average_price_dollar, component_url FROM components_price WHERE component_url IS NOT NULL AND component_url != ""')
+  cursor.execute("SELECT component_name, average_price_dollar, component_url FROM components_price WHERE component_url IS NOT NULL AND component_url != ''")
   items = cursor.fetchall()
 
   for item in items:
@@ -47,6 +51,9 @@ def update_base():
 
     new_price = get_amazon(url)
     if new_price:
+      if "amazon.pl" in url:
+        new_price = int(new_price / 3.62)
+
       if new_price != old_price:
         print(f"For {name} was found new price {new_price}")
 
@@ -58,7 +65,7 @@ def update_base():
     else:
       print("⚠️ Error")
 
-    time.sleep(random.randint(2,5))
+    time.sleep(random.randint(3,5))
   
   conn.close()
   print("🏁 UPDATE IS FINISHED")

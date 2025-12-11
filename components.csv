@@ -1,28 +1,28 @@
 "component_type	";component_name;average_price_dollar;category;component_url
-cpu;Intel Core i5-13400;250;mid;
-cpu;Intel Core i7-13700K;420;high;
+cpu;Intel Core i5-13400;250;mid;https://www.amazon.pl/Intel-BX8071513400F-i5-13400F-Procesor-Smart/dp/B0BN61LYFB
+cpu;Intel Core i7-13700K;420;high;https://www.amazon.pl/Intel-i7-14700K-LGA1700-Cores-Threads/dp/B0CHBFWJDN
 cpu;Intel Core i9-13900K;580;flagship;https://www.amazon.pl/Intel-komputer�w-stacjonarnych-elektrycznych-zintegrowan�/dp/B0BCF54SR1
-cpu;AMD Ryzen 5 7600X;300;mid;
-cpu;AMD Ryzen 7 7700X;400;high;
-cpu;AMD Ryzen 9 7900X;500;flagship;
-cpu;Intel Core i3-12100;120;budget;
-cpu;AMD Ryzen 5 5600X;180;budget;
-ram;16GB DDR4 3200MHz;50;budget;
-ram;16GB DDR5 4800MHz;80;mid;
+cpu;AMD Ryzen 5 7600X;300;mid;https://www.amazon.pl/AMD-7600X-zintegrowany-podr�cznej-chlodzenia/dp/B0BBJDS62N
+cpu;AMD Ryzen 7 7700X;400;high;https://www.amazon.pl/AMD-7700X-zintegrowany-podr�cznej-chlodzenia/dp/B0BBHHT8LY?
+cpu;AMD Ryzen 9 7900X;500;flagship;https://www.amazon.pl/AMD-7900X-zintegrowany-podr�cznej-chlodzenia/dp/B0BBJ59WJ4
+cpu;Intel Core i3-12100;120;budget;https://www.amazon.pl/Intel-i3-12100-LGA1700-Cores-Threads/dp/B09MDDX29R
+cpu;AMD Ryzen 5 5600X;180;budget;https://www.amazon.pl/AMD-Ryzen-5600X-podr�cznej-chlodzenia/dp/B08166SLDF?
+ram;16GB DDR4 3200MHz;50;budget;https://www.amazon.pl/Lexar-stacjonarnych-wysokowydajna-aktualizacja-LD4AU016G-B3200ASST/dp/B0C7Z279CP?
+ram;16GB DDR5 4800MHz;80;mid;https://www.amazon.pl/Pami��-zwi�kszenia-wydajno�ci-aplikacjach-wielozadaniowych/dp/B0F634Q4V7
 ram;32GB DDR4 3200MHz;90;mid;https://www.amazon.pl/Corsair-Vengeance-32GB-2x16GB-3200MHz/dp/B07RW6Z692
-ram;32GB DDR5 5600MHz;120;high;
-ram;64GB DDR5 6000MHz;220;flagship;
+ram;32GB DDR5 5600MHz;120;high;https://www.amazon.pl/VENGEANCE-Kompatybilno��-Systemem-Instalacja-�adowanie/dp/B0CK88P7VF
+ram;64GB DDR5 6000MHz;220;flagship;https://www.amazon.pl/CORSAIR-DOMINATOR-TITANIUM-Kompatybilna-Komputerowa/dp/B0CHSG1HZ5
 gpu;NVIDIA RTX 4060;300;mid;https://www.amazon.pl/Gigabyte-EAGLE-GeForce-NVIDIA-GDDR6/dp/B0C5JVS8VG
-gpu;NVIDIA RTX 4070;600;high;
-gpu;NVIDIA RTX 4090;1600;flagship;
-gpu;AMD RX 7600;270;budget;
-gpu;AMD RX 7700 XT;450;mid;
-gpu;AMD RX 7900 XTX;1000;high;
-storage;500GB NVMe SSD;40;budget;
+gpu;NVIDIA RTX 4070;600;high;https://www.amazon.pl/PNY-RTX-4070-Super-ARGB/dp/B0D2J2P8BF
+gpu;NVIDIA RTX 4090;1600;flagship;https://www.amazon.pl/Gaming-Geforce-90YV0IE0-M0NA00-Graficzna-Czarny/dp/B0BHD9TS9Q
+gpu;AMD RX 7600;270;budget;https://www.amazon.pl/VGA-Gigabyte-Radeon-7600-GAMING/dp/B0C5DXJ165
+gpu;AMD RX 7700 XT;450;mid;https://www.amazon.pl/Gigabyte-GAMING-Radeon-7700-GDDR6/dp/B0CGRN842P
+gpu;AMD RX 7900 XTX;1000;high;https://www.amazon.pl/graficzna-XFX-Speedster-MERC310-RX-79TMERCU9/dp/B0BNLT17XQ
+storage;500GB NVMe SSD;40;budget;https://www.amazon.pl/WD_BLACK-Pr�dko�ci�-DASHBOARD-Zaprojektowany-przeno�nych/dp/B0DN7JK8T4
 storage;1TB NVMe SSD;60;mid;https://www.amazon.pl/Lexar-Wewn�trzny-wysokowydajny-wewn�trzny-renderowania/dp/B0DNMCJHJP
-storage;2TB NVMe SSD;100;high;
-storage;4TB NVMe SSD;200;flagship;
-motherboard;ASUS PRIME B660;150;budget;
-"motherboard	";Gigabyte B760;200;mid;
+storage;2TB NVMe SSD;100;high;https://www.amazon.pl/Samsung-990-Plus-MZ-V9S2T0-crittografato/dp/B0DGHB9V34
+storage;4TB NVMe SSD;200;flagship;https://www.amazon.pl/Crucial-wewn�trzny-CT4000P3SSD801-edycja-Acronis/dp/B0CCNB5SH5
+motherboard;ASUS PRIME B660;150;budget;https://www.amazon.pl/Asus-PRIME-B660M-K-D4-o�wietleniem/dp/B0BK9LB98D
+"motherboard	";Gigabyte B760;200;mid;https://www.amazon.pl/Gigabyte-GA-Z790-EAGLE-AX-D/dp/B0CTMYKLL2
 motherboard;ASUS ROG STRIX Z790;350;high;https://www.amazon.pl/Strix-Z790-Gaming-90MB1CN0-M0EAY0-Matryca/dp/B0BH97W2N4
-motherboard;MSI MEG X670E;500;flagship;
+motherboard;MSI MEG X670E;500;flagship;https://www.amazon.pl/MSI-MAG-X670E-Tomahawk-Wifi/dp/B09YCV8XQG

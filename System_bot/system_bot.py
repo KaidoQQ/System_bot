@@ -123,7 +123,7 @@ def product_link(component_name):
 
 
 init_database()
-import_prices_from_csv()
+#import_prices_from_csv()
 #===================== Function for retrieving user data =====================
 def get_user_data(user_id):
   if user_id not in user_data_cache:
