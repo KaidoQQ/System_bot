@@ -386,7 +386,7 @@ def analyze_build_with_ai(computer):
 
   try:
     response = client.models.generate_content(
-      model="gemini-2.5-pro",
+      model="gemini-flash-latest",
       contents=prompt
     )
     return response.text
