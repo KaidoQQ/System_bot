@@ -53,60 +53,61 @@ def init_database():
   conn.close()
   print("✅ Databases initialized successfully")
 
-def import_prices_from_csv(csv_file_path = 'components.csv'):
-    try:
-      conn = sqlite3.connect('computers.db',check_same_thread=False)
-      cursor = conn.cursor()
+def import_prices_from_csv():
+  conn = sqlite3.connect('computers.db', check_same_thread=False)
+  cursor = conn.cursor()
 
-      with open(csv_file_path,'r',encoding='utf-8') as csvfile:
-        csv_reader = csv.reader(csvfile,delimiter=';')
-        next(csv_reader,None)
+  print("📂 Checking CSV file for new items...")
 
-        imported_count = 0
-        error_count = 0
-
+  try:
+    with open('components.csv', 'r', encoding='utf-8', errors='replace') as file:
+        csv_reader = csv.reader(file, delimiter=';')
+        
+        added_count = 0
         for row in csv_reader:
-          try:
-            if len(row) >= 4:
-              component_type = row[0].strip()
-              component_name = row[1].strip()
-              average_price_dollar = int(row[2].strip())
-              category = row[3].strip()
-              if len(row) >= 5:
-                component_url = row[4].strip()
-              else:
-                component_url = None
+            try:
+              if 'component_type' in row[0]: # Skip header
+                  continue
 
-              cursor.execute('''
-                INSERT OR REPLACE INTO components_price 
-                (component_type, component_name, average_price_dollar, category, component_url)
-                VALUES (?, ?, ?, ?, ?)
-              ''', (component_type, component_name, average_price_dollar, category, component_url))
+              if len(row) >= 4:
+                  component_type = row[0].strip()
+                  component_name = row[1].strip()
+                  
+                  raw_price = row[2].strip()
+                  if not raw_price:
+                      average_price_dollar = 0
+                  else:
+                      # If CSV contains PLN, convert roughly, otherwise assume USD
+                      average_price_dollar = int(raw_price)
 
-              imported_count += 1
-              print(f"✅ Added: {component_name} - ${average_price_dollar}")
-            else:
-              print(f"❌ Skipped row: not enough data - {row}")
-              error_count += 1
-          except ValueError as e:
-            print(f"❌ Data error: {row} - {e}")
-            error_count += 1
-          except Exception as e:
-            print(f"❌ Insert error: {row} - {e}")
-            error_count += 1
+                  category = row[3].strip()
+                  
+                  component_url = None
+                  if len(row) >= 5:
+                      component_url = row[4].strip()
+
+                  # INSERT OR IGNORE: Prevents overwriting updated prices from the parser
+                  cursor.execute('''
+                      INSERT OR IGNORE INTO components_price 
+                      (component_type, component_name, average_price_dollar, category, component_url)
+                      VALUES (?, ?, ?, ?, ?)
+                  ''', (component_type, component_name, average_price_dollar, category, component_url))
+                  
+                  if cursor.rowcount > 0:
+                      added_count += 1
+                        
+            except Exception as e:
+                print(f"❌ CSV Row Error: {e}")
 
         conn.commit()
+        print(f"✅ Import finished. New items added: {added_count}")
 
-        print(f"\n📊 Import completed!")
-        print(f"✅ Successful: {imported_count}")
-        print(f"❌ Errors: {error_count}")
-    except FileNotFoundError:
-      print(f"❌ File {csv_file_path} not found!")
-    except Exception as e:
-      print(f"❌ Import error: {e}")
-    finally:
-      if 'conn' in locals():
-        conn.close() 
+  except FileNotFoundError:
+      print("❌ File 'components.csv' not found!")
+  except Exception as e:
+      print(f"❌ CSV Global Error: {e}")
+
+  conn.close() 
 
 
 def product_link(component_name):
@@ -123,7 +124,7 @@ def product_link(component_name):
 
 
 init_database()
-#import_prices_from_csv()
+import_prices_from_csv()
 #===================== Function for retrieving user data =====================
 def get_user_data(user_id):
   if user_id not in user_data_cache:
