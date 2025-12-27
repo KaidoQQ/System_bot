@@ -9,7 +9,7 @@ A Telegram bot designed to help users plan, price, and validate custom PC builds
 * **🔍 Smart Search:** Search for components (CPU, GPU, RAM, etc.) by name using a relevance scoring algorithm.
 * **💰 Automatic Pricing:** Calculates the total cost of the build in real-time.
 * **✍️ Manual Entry:** Allows users to manually enter component names and prices if they are not found in the database.
-* **🤖 AI Integration:** Uses **Google Gemini 1.5 Flash** to analyze the completed build, identify bottlenecks, and rate compatibility (1-10).
+* **🤖 AI Integration:** Uses **Google Gemini Flash latest version** to analyze the completed build, identify bottlenecks, and rate compatibility (1-10).
 
 ## 🚀 Tech Stack
 
@@ -23,7 +23,9 @@ A Telegram bot designed to help users plan, price, and validate custom PC builds
 
 ```text
 ├── System_bot/
-│   └── system_bot.py      # Main bot application logic
+│   │── system_bot.py      # Main bot application logic
+│   │── parsing.py         # Automatization with BeautifulSoup
+│   └── app.py             # Page where you can check all your setups
 ├── components.csv         # Database source for component prices
 ├── computers.db           # SQLite database (generated automatically)
 ├── .gitignore             # Git configuration to hide secrets
@@ -40,7 +42,7 @@ cd System_bot
 
 ### 2. Install dependencies
 ```bash
-pip install pyTelegramBotAPI google-genai
+pip install pyTelegramBotAPI google-genai beautifulsoup4
 ```
 
 ### 3. Configure API Keys
