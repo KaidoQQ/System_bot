@@ -1,88 +1,124 @@
-import requests
-from bs4 import BeautifulSoup
+"""
+parsing.py  —  Amazon price updater.
+
+Run standalone:  python parsing.py
+"""
+
+import re
 import time
 import random
 import sqlite3
-import re
+import logging
+from typing import Optional
 
+import requests
+from bs4 import BeautifulSoup
 
-def get_amazon(url):
-  headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "Accept-Language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Connection": "keep-alive",
+from config import PLN_TO_USD_RATE
+
+logger = logging.getLogger("parser")
+
+DB_PATH = "computers.db"
+
+HEADERS = {
+    "User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                 "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                                 "image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language":           "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept-Encoding":           "gzip, deflate, br",
+    "Connection":                "keep-alive",
     "Upgrade-Insecure-Requests": "1",
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "none",
-    "Sec-Fetch-User": "?1",
-    "Cache-Control": "max-age=0",
-  }
+    "Sec-Fetch-Dest":            "document",
+    "Sec-Fetch-Mode":            "navigate",
+    "Sec-Fetch-Site":            "none",
+    "Sec-Fetch-User":            "?1",
+    "Cache-Control":             "max-age=0",
+}
 
-  try:
-    response = requests.get(url,headers=headers)
-    if response.status_code == 200:
-      soup = BeautifulSoup(response.text,'html.parser')
+# Retry settings
+MAX_RETRIES  = 3
+RETRY_DELAY  = 5   # seconds between retries
+SLEEP_RANGE  = (10, 15)  # seconds between items
 
-      price = soup.select_one('.a-price-whole')
 
-      if price:
-        raw_price = price.get_text()
-        clean_price = re.sub(r'\D', '', raw_price)
-        return int(clean_price)
-      else:
-        title = soup.title.text.strip() if soup.title else "No Title"
-        print(f"   ⚠️ Cant get a price. Page title: '{title}'")
-    else:
-      print("Cant enter to site")
-      return None
-  except Exception as e:
-    print(f"Error {e}")
+def get_amazon_price(url: str, retries: int = MAX_RETRIES) -> Optional[int]:
+    """
+    Fetch a product price from Amazon.
+    Returns price in USD (converts PLN if the URL is amazon.pl).
+    Returns None on failure.
+    """
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=15)
+
+            if response.status_code != 200:
+                logger.warning("  HTTP %d (attempt %d/%d)", response.status_code, attempt, retries)
+                time.sleep(RETRY_DELAY)
+                continue
+
+            soup  = BeautifulSoup(response.text, "html.parser")
+            price_el = soup.select_one(".a-price-whole")
+
+            if not price_el:
+                title = soup.title.text.strip() if soup.title else "No title"
+                logger.warning("  ⚠️ Price element not found. Page title: '%s'", title)
+                return None
+
+            raw_price = re.sub(r"\D", "", price_el.get_text())
+            price     = int(raw_price)
+
+            # Convert PLN → USD if needed
+            if "amazon.pl" in url:
+                price = round(price / PLN_TO_USD_RATE)
+
+            return price
+
+        except requests.RequestException as e:
+            logger.warning("  Network error (attempt %d/%d): %s", attempt, retries, e)
+            time.sleep(RETRY_DELAY)
+
+    logger.error("  ❌ Failed after %d attempts: %s", retries, url)
     return None
-  
-def update_base():
-  print("🚀 Start...")
-  conn = sqlite3.connect('computers.db',check_same_thread=False)
-  cursor = conn.cursor()
 
-  cursor.execute("SELECT component_name, average_price_dollar, component_url FROM components_price WHERE component_url IS NOT NULL AND component_url != ''")
-  items = cursor.fetchall()
 
-  for item in items:
-    name = item[0]
-    old_price = item[1]
-    url = item[2]
+def update_prices() -> None:
+    logger.info("🚀 Starting price update…")
 
-    new_price = get_amazon(url)
-    if new_price:
-      if "amazon.pl" in url:
-        new_price = int(new_price / 3.62)
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT component_name, average_price_dollar, component_url "
+            "FROM components_price "
+            "WHERE component_url IS NOT NULL AND component_url != ''",
+        ).fetchall()
 
-      if new_price != old_price:
-        print(f"For {name} was found new price {new_price}")
+    updated = 0
+    failed  = 0
 
-        cursor.execute('UPDATE components_price SET average_price_dollar = ? WHERE component_name = ?',(new_price, name))
-        conn.commit()
-        print("✅ Success")
-      else:
-        print("Price the same as new")
-    else:
-      print("⚠️ Error")
+    for name, old_price, url in rows:
+        logger.info("Checking: %s", name)
+        new_price = get_amazon_price(url)
 
-    time.sleep(random.randint(10,15))
-  
-  conn.close()
-  print("🏁 UPDATE IS FINISHED")
+        if new_price is None:
+            logger.warning("  ⚠️ Could not fetch price for %s", name)
+            failed += 1
+        elif new_price == old_price:
+            logger.info("  Price unchanged ($%d)", old_price)
+        else:
+            logger.info("  💰 New price: $%d → $%d", old_price, new_price)
+            with sqlite3.connect(DB_PATH) as conn:
+                conn.execute(
+                    "UPDATE components_price SET average_price_dollar = ? WHERE component_name = ?",
+                    (new_price, name),
+                )
+                conn.commit()
+            updated += 1
+
+        time.sleep(random.randint(*SLEEP_RANGE))
+
+    logger.info("🏁 Done. Updated: %d | Failed: %d | Total: %d", updated, failed, len(rows))
+
 
 if __name__ == "__main__":
-  update_base()
-
-
-
-
-
-
-
-
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    update_prices()

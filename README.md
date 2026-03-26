@@ -22,14 +22,17 @@ A Telegram bot designed to help users plan, price, and validate custom PC builds
 ## 📂 Project Structure
 
 ```text
-├── System_bot/
-│   │── system_bot.py      # Main bot application logic
-│   │── parsing.py         # Automatization with BeautifulSoup
-│   └── app.py             # Page where you can check all your setups
-├── components.csv         # Database source for component prices
-├── computers.db           # SQLite database (generated automatically)
-├── .gitignore             # Git configuration to hide secrets
-└── README.md              # Project documentation
+project/
+├── bot.py          # entry point, bot init
+├── db.py           # all sqlite operations
+├── models.py       # COMPONENT_MAP, COMPONENTS constant
+├── utils.py        # search_component_price, score_relevance, analyze_build_with_ai, count_total_price
+├── handlers/
+│   ├── __init__.py
+│   ├── menu.py     # start, back_menu, tabs
+│   ├── computer.py # create, view, choose computers
+│   └── components.py # add/change/delete components, text input handler
+└── parsing.py      # refactored parser
 ```
 
 ## ⚙️ Installation & Setup
